@@ -1,0 +1,18 @@
+[
+{
+    "id": 1,
+    "empresa": "Viação Central",
+    "origem": "Goiânia",
+    "destino": "Anápolis",
+    "status": "Em andamento",
+    "previsaoChegada": "14:30"
+},
+{
+    "id": 2,
+    "empresa": "Expresso Leste",
+    "origem": "Anápolis",
+    "destino": "Brasília",
+    "status": "Aguardando saída",
+    "previsaoChegada": "18:45"
+}
+]
