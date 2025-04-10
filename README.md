@@ -48,6 +48,9 @@ mobtech/
 3. As páginas `admin.html` e `viagem.html` estão sendo desenvolvidas nas próximas etapas do projeto.
 
 ## Próximos Passos 🛤️  
+- Carregar e exibir os dados simulados de viagens do arquivo `trips.json` na página `admin.html`.  
+- Criar a interface da página `viagem.html` com mapa e dados da viagem simulada.  
+- Simular localização do ônibus usando JavaScript, com movimentação no mapa.  
 - Criar sistema de login e autenticação para empresas.  
 - Desenvolver o painel administrativo completo.  
 - Integrar localização via GPS com base em dados reais.  
