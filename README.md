@@ -1,5 +1,5 @@
-# MobTech Solutions 🚌💻  
-**MobTech Solutions** é uma plataforma web responsiva desenvolvida para oferecer **rastreamento em tempo real de viagens rodoviárias**, além de permitir que empresas de ônibus gerenciem suas frotas de forma eficiente. Este projeto faz parte do nosso **Trabalho de Conclusão de Curso (TCC)** em Engenharia de Software.
+# MobTech Solutions 📱🚌  
+**MobTech Solutions** é um **aplicativo mobile multiplataforma** desenvolvido para oferecer **rastreamento em tempo real de viagens rodoviárias**, além de permitir que empresas de ônibus gerenciem suas frotas de forma eficiente. Este projeto faz parte do nosso **Trabalho de Conclusão de Curso (TCC)** em Engenharia de Software.
 
 ## Objetivo do Projeto 🎯  
 Criar uma solução tecnológica para modernizar o transporte rodoviário de passageiros, oferecendo:  
@@ -10,52 +10,61 @@ Criar uma solução tecnológica para modernizar o transporte rodoviário de pas
 - Dashboard para empresas cadastrarem e monitorarem suas viagens.
 
 ## Tecnologias Utilizadas 🛠️  
-- **Frontend**: HTML, CSS, JavaScript  
+- **Frontend (Mobile)**: React Native  
+- **Backend (API)**: FastAPI (Python)  
+- **Banco de Dados**: PostgreSQL com PostGIS  
 - **Mapa Interativo**: Google Maps API  
-- **Backend (em desenvolvimento)**: Node.js ou Python (FastAPI/Django)  
-- **Banco de Dados (em planejamento)**: PostgreSQL com PostGIS  
 - **Notificações**: Firebase Cloud Messaging (planejado)  
+- **Versionamento**: Git e GitHub
 
-## Estrutura do Projeto 📁  
+## Estrutura do Projeto 📁   
 ```
 mobtech/
-├── assets/              # Imagens, ícones e arquivos estáticos
-├── css/                 # Estilos da interface
-│   └── style.css
-├── js/                  # Scripts de interação
-│   └── script.js
-├── data/                # Arquivos simulados de viagens e rotas
-│   └── trips.json
-├── index.html           # Página principal do sistema
-├── admin.html           # Dashboard administrativo (em desenvolvimento)
-├── viagem.html          # Página de rastreamento da viagem (em desenvolvimento)
+├── assets/              # Imagens e ícones
+├── src/
+│   ├── components/      # Componentes reutilizáveis
+│   ├── screens/         # Telas do aplicativo (Home, Viagem, Admin)
+│   ├── services/        # Serviços de API e utilitários
+│   └── App.js           # Componente raiz
+├── backend/             # Código da API FastAPI (em desenvolvimento)
+├── database/            # Scripts de modelagem e dados simulados
 └── README.md            # Documentação do projeto
 ```
 
 ## Funcionalidades 🚀  
-- Mapa interativo com a posição do ônibus.  
-- Detalhes da viagem em tempo real.  
-- Integração com APIs para cálculo de rota e tempo.  
-- Interface pensada para empresas e passageiros.  
-- Planejamento para sugestões de mobilidade no destino.  
+- Rastreamento de ônibus com mapa interativo.  
+- Detalhes da viagem atual em tempo real.  
+- Integração com APIs externas (rota, tempo estimado, notificações).  
+- Interface intuitiva para empresas e passageiros.  
+- Sugestões de mobilidade e locais ao final da viagem.  
 
 ## Como Executar o Projeto 🖥️  
+
 1. Clone o repositório:  
    ```bash
    git clone https://github.com/CalebeRRdev/mobtech-solutions.git
    ```
-2. Abra o arquivo `index.html` no navegador para simular o funcionamento inicial.  
-3. As páginas `admin.html` e `viagem.html` estão sendo desenvolvidas nas próximas etapas do projeto.
 
-## Próximos Passos 🛤️  
-- Carregar e exibir os dados simulados de viagens do arquivo `trips.json` na página `admin.html`.  
-- Criar a interface da página `viagem.html` com mapa e dados da viagem simulada.  
-- Simular localização do ônibus usando JavaScript, com movimentação no mapa.  
-- Criar sistema de login e autenticação para empresas.  
-- Desenvolver o painel administrativo completo.  
-- Integrar localização via GPS com base em dados reais.  
-- Criar sistema de notificações ao passageiro.  
-- Implementar painel com sugestões ao fim da viagem.
+2.	Navegue até o diretório do projeto e instale as dependências:
+   ```bash
+   cd mobtech-solutions
+   npm install
+   ```
+
+3.	Execute o app em modo de desenvolvimento:
+   ```bash
+   npx expo start
+   ```
+   
+4.	Use um emulador ou o app do Expo no celular para visualizar.
+
+Próximos Passos 🛤️
+	•	Desenvolver telas e navegação no React Native.
+	•	Criar endpoints REST com FastAPI para viagens e login.
+	•	Integrar GPS e exibir localização real dos ônibus.
+	•	Desenvolver painel de empresa com autenticação.
+	•	Implementar sugestões baseadas na localização do destino.
+	•	Adicionar sistema de notificações com Firebase.
 
 ## Autores ✍️  
 - [CalebeRRdev](https://github.com/CalebeRRdev)  
