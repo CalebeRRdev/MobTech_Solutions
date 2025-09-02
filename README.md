@@ -11,37 +11,21 @@ Criar uma solução tecnológica para modernizar o transporte rodoviário de pas
 
 ## Tecnologias Utilizadas 🛠️  
 - **Frontend (Mobile)**: React Native  
-- **Backend (API)**: FastAPI (Python)  
+- **Backend (API)**: Express (JavaScript)
 - **Banco de Dados**: PostgreSQL com PostGIS  
 - **Mapa Interativo**: Google Maps API  
-- **Notificações**: Firebase Cloud Messaging (planejado)  
+- **Notificações**: Firebase Cloud Messaging
 - **Versionamento**: Git e GitHub
 
 ## Estrutura do Projeto 📁   
 ```
-mobtech/
-├── assets/                   # Ícones, imagens e logos
-├── src/
-│   ├── components/           # Componentes reutilizáveis (Botões, Cards, etc)
-│   ├── screens/              # Telas da aplicação
-│   │   ├── HomeScreen.js
-│   │   ├── ViagemScreen.js
-│   │   └── AdminScreen.js
-│   ├── services/             # Requisições à API, hooks
-│   │   └── api.js
-│   ├── App.js                # Componente principal do app
-│   └── navigation.js         # Configuração de navegação (React Navigation)
-├── backend/
-│   ├── main.py               # Entrada da API FastAPI
-│   ├── models.py             # Modelos de dados
-│   ├── routes.py             # Rotas/endpoints
-│   └── database.py           # Conexão com PostgreSQL
-├── database/
-│   └── mock_data.json        # Viagens simuladas, se quiser
+MobTech_Solutions/
+├── BACKEND/
+|   ├── .gitignore
+│   ├── index.js
+|   ├── package.json
+│   ├── package-lock.json
 ├── README.md
-├── .gitignore
-├── package.json
-└── requirements.txt          # Dependências do backend (FastAPI, etc)
 ```
 
 ## Funcionalidades 🚀  
@@ -55,7 +39,7 @@ mobtech/
 
 1. Clone o repositório:  
    ```bash
-   git clone https://github.com/CalebeRRdev/mobtech-solutions.git
+   git clone https://github.com/CalebeRRdev/MobTech_Solutions
    ```
 
 2.	Navegue até o diretório do projeto e instale as dependências:
