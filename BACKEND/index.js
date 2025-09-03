@@ -44,6 +44,11 @@ app.post('/usuarios', (requisicao, resposta) => {
     }
 })
 
+// ROTA para atualizar o usuário por completo
+// http://localhost:3000/usuarios/id
+app.put('/usuarios/:id', (requisicao, resposta) => {
+    
+})
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta http://localhost:${port}`)
