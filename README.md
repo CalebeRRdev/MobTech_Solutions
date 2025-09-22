@@ -62,13 +62,15 @@ MobTech_Solutions/
 
 ---
 
-⚙️ Pré-requisitos
-	•	Node.js >= 18
-	•	npm ou yarn
-	•	Expo CLI
-	•	Xcode (para iOS) ou Android Studio (para Android)
+## ⚙️ Pré-requisitos
+-	Node.js >= 18
+-	npm ou yarn
+-	Expo CLI
+-	Xcode (para iOS) ou Android Studio (para Android)
 
-▶️ Como Rodar:
+---
+
+## ▶️ Como Rodar:
 
 1º passo: Clone o repositório
 
@@ -116,12 +118,12 @@ npm start
 ```
 ---
 
-✨ Roadmap
-	•	Conectar frontend com backend (API).
-	•	Implementar PostGIS para georreferenciamento.
-	•	Adicionar notificações push para atrasos.
-	•	Compartilhamento de viagens via QR Code.
-	•	Autenticação de usuários (Firebase).
+## ✨ Roadmap
+-	Conectar frontend com backend (API).
+-	Implementar PostGIS para georreferenciamento.
+-	Adicionar notificações push para atrasos.
+-	Compartilhamento de viagens via QR Code.
+-	Autenticação de usuários (Firebase).
 
 ---
 
