@@ -5,7 +5,19 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#007BFF', // Azul do mockup
+        tabBarActiveTintColor: '#007BFF',   // cor dos ícones/labels ativos
+        tabBarInactiveTintColor: '#999',    // cor dos ícones/labels inativos
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          height: 70,
+          marginBottom: 0,
+          elevation: 4, // sombra para Android
+          position: 'absolute', // deixa a barra fixa e estilizada
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
         headerStyle: {
           backgroundColor: '#007BFF',
         },
@@ -16,10 +28,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          // headerShown: false,
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />
+            <Ionicons
+              name={focused ? 'home-sharp' : 'home-outline'}
+              color={color}
+              size={26}
+            />
           ),
         }}
       />
@@ -28,7 +43,11 @@ export default function TabLayout() {
         options={{
           title: 'Tickets',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'ticket' : 'ticket-outline'} color={color} size={24}/>
+            <Ionicons
+              name={focused ? 'ticket' : 'ticket-outline'}
+              color={color}
+              size={26}
+            />
           ),
         }}
       />
@@ -37,7 +56,11 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'person' : 'person-outline'} color={color} size={24}/>
+            <Ionicons
+              name={focused ? 'person' : 'person-outline'}
+              color={color}
+              size={26}
+            />
           ),
         }}
       />
