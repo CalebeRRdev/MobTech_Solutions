@@ -1,77 +1,75 @@
 import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import CityPicker from './cityPicker';
 
-// Tipagem para as props do componente
 interface SearchFormProps {
-  origem: string;           // Valor atual da origem
-  destino: string;          // Valor atual do destino
-  setOrigem: (value: string) => void; // Função para atualizar origem
-  setDestino: (value: string) => void; // Função para atualizar destino
+  origem: string;
+  destino: string;
+  setOrigem: (value: string) => void;
+  setDestino: (value: string) => void;
 }
 
-// Componente SearchForm
-const SearchForm: React.FC<SearchFormProps> = ({ origem, destino, setOrigem, setDestino }) => {
+const SearchForm: React.FC<SearchFormProps> = ({
+  origem,
+  destino,
+  setOrigem,
+  setDestino,
+}) => {
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Origem (ex.: My location)"
-        value={origem}
-        onChangeText={setOrigem}
-        accessible
-        accessibilityLabel="Campo de origem"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Destino (ex.: Goiânia)"
-        value={destino}
-        onChangeText={setDestino}
-        accessible
-        accessibilityLabel="Campo de destino"
-      />
+    <View style={styles.wrapper}>
+      {/* Campo ORIGEM (z-index maior para sobrepor o de baixo quando aberto) */}
+      <View style={styles.rowTop}>
+        <CityPicker
+          placeholder="Origem"
+          value={origem}
+          onChange={setOrigem}
+          exclude={destino || null}
+          inputStyle={styles.input}       // mantém o visual original
+          containerStyle={styles.field}   // permite passar arrays sem erro
+        />
+      </View>
+
+      {/* Campo DESTINO */}
+      <View style={styles.rowBottom}>
+        <CityPicker
+          placeholder="Destino"
+          value={destino}
+          onChange={setDestino}
+          exclude={origem || null}
+          inputStyle={styles.input}
+          containerStyle={[styles.field, { marginTop: 12 }]}
+        />
+      </View>
     </View>
   );
 };
 
-// Estilo dos inputs de origem e destino
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',            // ocupa a largura disponível
-    justifyContent: 'center', // centraliza verticalmente dentro do pai
-    alignItems: 'center',     // centraliza horizontalmente dentro do pai
-    marginBottom: 30,         // espaçamento abaixo do formulário
-    backgroundColor: '#2B547E',
-    padding: 10,
-    marginTop: 10,
-    elevation: 4, // sombra para Android
-    shadowColor: '#000', // sombra para iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    borderRadius: 20,
-    shadowColor: '#000', // sombra para iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+  // precisa permitir o dropdown “passar” por cima do botão abaixo
+  wrapper: {
+    width: '90%',
+    alignSelf: 'center',
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 50,
+  },
+  field: {
+    // espaço entre campos controlado a partir daqui
   },
   input: {
-    height: 50,
-    width: '90%',             // inputs não grudam na lateral
-    backgroundColor: '#FFFFFF',
+    height: 48,
     borderRadius: 8,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#989898ff',
-    paddingHorizontal: 16,
-    marginBottom: 20,
-    marginTop: 15,
-    fontSize: 16,
-    fontcolor: '#000000',
-    // Sombra para iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    // Elevação para Android
-    elevation: 2,
+    borderColor: '#D9D9D9',
+    paddingHorizontal: 14,
+    fontSize: 18,
+  },
+  rowTop: {
+    zIndex: 60, // acima do de baixo
+  },
+  rowBottom: {
+    zIndex: 55,
   },
 });
 

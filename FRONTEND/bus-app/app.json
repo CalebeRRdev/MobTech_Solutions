@@ -1,14 +1,22 @@
 {
   "expo": {
-    "name": "bus-app",
-    "slug": "bus-app",
+    "name": "MobTech",
+    "slug": "MobTech",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "busapp",
+    "icon": "./assets/images/bus-app-icon.png",
+    "scheme": "MobTech",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "platforms": ["ios", "android", "web"],
+
+    "splash": {
+      "image": "./assets/images/splash-logo.png",
+      "imageWidth": 260,
+      "resizeMode": "contain",
+      "backgroundColor": "#012d81"
+    },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.jebediah.busapp",
@@ -16,10 +24,11 @@
         "NSLocationWhenInUseUsageDescription": "Precisamos da sua localização para mostrar sua posição no mapa."
       }
     },
+
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/bus-app-icon.png",
+        "backgroundColor": "#012d81"
       },
       "edgeToEdgeEnabled": true,
       "config": {
@@ -33,22 +42,15 @@
       ],
       "package": "com.jebediah.busapp"
     },
+
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/bus-app-icon.png"
     },
+
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
       [
         "expo-maps",
         {
@@ -57,15 +59,18 @@
         }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true
     },
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "4c438f1d-0c20-4e59-aab4-337bb5439dac"
       }
     },
+
     "owner": "jebediah"
   }
 }
