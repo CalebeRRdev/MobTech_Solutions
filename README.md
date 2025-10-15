@@ -1,83 +1,131 @@
-# MobTech Solutions 📱🚌  
-**MobTech Solutions** é um **aplicativo mobile multiplataforma** desenvolvido para oferecer **rastreamento em tempo real de viagens rodoviárias**, além de permitir que empresas de ônibus gerenciem suas frotas de forma eficiente. Este projeto faz parte do nosso **Trabalho de Conclusão de Curso (TCC)** em Engenharia de Software.
+# 🚌 MobTech Solutions - Bus App
 
-## Objetivo do Projeto 🎯  
-Criar uma solução tecnológica para modernizar o transporte rodoviário de passageiros, oferecendo:  
-- Visualização em tempo real da localização do ônibus.  
-- Tempo estimado de chegada ao destino (ETA).  
-- Status da viagem: em andamento, atrasado, concluído.  
-- Integração com serviços complementares ao final da viagem (Uber, restaurantes, hotéis).  
-- Dashboard para empresas cadastrarem e monitorarem suas viagens.
+Aplicativo **mobile multiplataforma** para rastreamento de viagens rodoviárias e gestão de ônibus intermunicipais.  
+Este projeto faz parte do **TCC de graduação** e tem como objetivo demonstrar a viabilidade técnica de um **SaaS adaptável** para empresas de transporte rodoviário.
 
-## Tecnologias Utilizadas 🛠️  
-- **Frontend (Mobile)**: React Native  
-- **Backend (API)**: FastAPI (Python)  
-- **Banco de Dados**: PostgreSQL com PostGIS  
-- **Mapa Interativo**: Google Maps API  
-- **Notificações**: Firebase Cloud Messaging (planejado)  
-- **Versionamento**: Git e GitHub
+---
 
-## Estrutura do Projeto 📁   
+## 🚀 Tecnologias Utilizadas
+
+### Frontend
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/) (com Expo Router v5)
+- [TypeScript](https://www.typescriptlang.org/)
+- [React Navigation](https://reactnavigation.org/)
+- [Expo Maps](https://docs.expo.dev/versions/latest/sdk/maps/)
+- [Expo Dev Client](https://docs.expo.dev/develop/development-builds/introduction/)
+
+### Backend
+- [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/) *(versão atual, prototípica)*
+- [FastAPI](https://fastapi.tiangolo.com/) *(planejado em roadmap)*
+- [PostgreSQL](https://www.postgresql.org/) + [PostGIS](https://postgis.net/) *(para geolocalização, em desenvolvimento)*
+- Firebase *(notificações e autenticação futura)*
+
+---
+
+## 📂 Estrutura do Projeto
+
+```bash
+MobTech_Solutions/
+│
+├── BACKEND/                  # API para suporte ao app
+│   ├── index.js              # Entry point do servidor (Node.js / Express)
+│   ├── package.json          # Dependências e scripts do backend
+│   ├── package-lock.json
+│   └── .gitignore
+│
+└── FRONTEND/
+    └── bus-app/              # Aplicativo mobile (Expo + React Native)
+        ├── app/              # Telas principais e rotas (Expo Router)
+        │   └── (tabs)/       # Navegação em abas (Home, Tickets, Profile)
+        │       ├── index.tsx
+        │       ├── profile.tsx
+        │       ├── ticket.tsx
+        │       └── _layout.tsx
+        │
+        ├── assets/           # Ícones, imagens e splash
+        ├── components/       # Componentes reutilizáveis (ex.: SearchForm)
+        │   └── searchForm.tsx
+        │
+        ├── ios/              # Build iOS (gerado pelo expo run:ios)
+        ├── node_modules/     # Dependências instaladas
+        ├── types/            # Tipagens auxiliares (TypeScript)
+        ├── .expo/            # Configurações internas do Expo
+        ├── .vscode/          # Configurações do VSCode
+        ├── app.json          # Configuração do app Expo
+        ├── eas.json          # Configuração para builds com EAS
+        ├── package.json      # Dependências do frontend
+        ├── tsconfig.json     # Configuração TypeScript
+        ├── eslint.config.js  # Regras de lint
+        └── README.md         # Documentação do frontend
 ```
-mobtech/
-├── assets/                   # Ícones, imagens e logos
-├── src/
-│   ├── components/           # Componentes reutilizáveis (Botões, Cards, etc)
-│   ├── screens/              # Telas da aplicação
-│   │   ├── HomeScreen.js
-│   │   ├── ViagemScreen.js
-│   │   └── AdminScreen.js
-│   ├── services/             # Requisições à API, hooks
-│   │   └── api.js
-│   ├── App.js                # Componente principal do app
-│   └── navigation.js         # Configuração de navegação (React Navigation)
-├── backend/
-│   ├── main.py               # Entrada da API FastAPI
-│   ├── models.py             # Modelos de dados
-│   ├── routes.py             # Rotas/endpoints
-│   └── database.py           # Conexão com PostgreSQL
-├── database/
-│   └── mock_data.json        # Viagens simuladas, se quiser
-├── README.md
-├── .gitignore
-├── package.json
-└── requirements.txt          # Dependências do backend (FastAPI, etc)
+
+---
+
+## ⚙️ Pré-requisitos
+-	Node.js >= 18
+-	npm ou yarn
+-	Expo CLI
+-	Xcode (para iOS) ou Android Studio (para Android)
+
+---
+
+## ▶️ Como Rodar:
+
+1º passo: Clone o repositório
+
+```
+git clone https://github.com/seu-usuario/mobtech-solutions.git
+cd mobtech-solutions/MobTech_Solutions/FRONTEND/bus-app
+```
+2º passo: Instale as dependências
+
+```
+npm install
+# ou
+yarn install
+```
+3º passo: Rodar o aplicativo
+
+➡️ Expo Go (mais simples, sem recursos nativos)
+```
+npx expo start -c
+```
+•	Escaneie o QR Code com o app Expo Go (disponível na App Store e Google Play).
+
+➡️ Emulador Android
+	1.	Configure o Android Studio.
+	2.	Crie e inicie um dispositivo virtual (AVD).
+	3.	Rode:
+```
+npx expo run:android
 ```
 
-## Funcionalidades 🚀  
-- Rastreamento de ônibus com mapa interativo.  
-- Detalhes da viagem atual em tempo real.  
-- Integração com APIs externas (rota, tempo estimado, notificações).  
-- Interface intuitiva para empresas e passageiros.  
-- Sugestões de mobilidade e locais ao final da viagem.  
+➡️ Simulador iOS (somente macOS)
+	1.	Instale o Xcode.
+	2.	Rode:
+```
+npx expo run:ios
+```
 
-## Como Executar o Projeto 🖥️  
+4º passo: Rodar o backend
 
-1. Clone o repositório:  
-   ```bash
-   git clone https://github.com/CalebeRRdev/mobtech-solutions.git
-   ```
+Entre na pasta BACKEND:
+```
+cd mobtech-solutions/MobTech_Solutions/BACKEND
+npm install
+npm start
+```
+---
 
-2.	Navegue até o diretório do projeto e instale as dependências:
-   ```bash
-   cd mobtech-solutions
-   npm install
-   ```
+## ✨ Roadmap
+-	Conectar frontend com backend (API).
+-	Implementar PostGIS para georreferenciamento.
+-	Adicionar notificações push para atrasos.
+-	Compartilhamento de viagens via QR Code.
+-	Autenticação de usuários (Firebase).
 
-3.	Execute o app em modo de desenvolvimento:
-   ```bash
-   npx expo start
-   ```
-
-4.	Use um emulador ou o app do Expo no celular para visualizar.
-
-Próximos Passos 🛤️
-	•	Desenvolver telas e navegação no React Native.
-	•	Criar endpoints REST com FastAPI para viagens e login.
-	•	Integrar GPS e exibir localização real dos ônibus.
-	•	Desenvolver painel de empresa com autenticação.
-	•	Implementar sugestões baseadas na localização do destino.
-	•	Adicionar sistema de notificações com Firebase.
+---
 
 ## Autores ✍️  
 - [CalebeRRdev](https://github.com/CalebeRRdev)  
