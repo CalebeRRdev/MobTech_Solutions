@@ -1,0 +1,87 @@
+### Listar todas as linhas
+GET http://localhost:3000/linhas
+Content-Type: application/json
+
+###
+
+### Buscar uma linha específica (ex: id 1)
+GET http://localhost:3000/linhas/1
+Content-Type: application/json
+
+###
+
+### Buscar todas as paradas que uma linha de ônibus tem
+GET http://localhost:3000/linhas/2/paradas
+Content-Type: application/json
+
+###
+
+### Buscar todas as paradas registradas
+GET http://localhost:3000/paradas
+Content-Type: application/json
+
+###
+
+### GET - Buscar paradas por nome
+GET http://localhost:3000/paradas/buscar?nome=comercial
+Content-Type: application/json
+
+###
+
+### GET - Buscar todas as linhas de ônibus que uma parada atende
+GET http://localhost:3000/paradas/49/linhas
+Content-Type: application/json
+
+###
+
+### GET - Buscar parada de ônibus específica pelo id
+GET http://localhost:3000/paradas/2
+Content-Type: application/json
+
+###
+
+
+### GET - Listar o trajeto de uma linha pelo id da linha
+GET http://localhost:3000/trajetos/1
+Content-Type: application/json
+
+###
+
+### POST - Registrar  ou atualizar localização
+POST http://localhost:3000/localizacaoOnibus
+Content-Type: application/json
+
+{
+    "onibus_id": 1,
+    "latitude": -16.33320967,
+    "longitude": -48.92046450
+}
+###
+
+### GET para listar a localização do onibus
+GET http://localhost:3000/localizacaoOnibus
+Content-Type: application/json
+
+###
+
+### POST - Encontrar paradas próximas ao usuário, e para de destino
+POST http://localhost:3000/rotas
+Content-Type: application/json
+
+{
+  "origem": {
+    "latitude": -16.325,
+    "longitude": -48.925
+  },
+  "destino": {
+    "latitude": -16.323,
+    "longitude": -48.957
+  }
+}
+
+// -16.325, -48.925
+// -16.323676278893345, -48.95711660294303
+// -16.353882447875694, -48.93957418890316
+// -16.29493815749534, -48.944616386506915
+// -16.33320967191722, -48.92046450470594
+###
