@@ -4,13 +4,22 @@
     "slug": "mobtech",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/appstore.png",
     "scheme": "mobtech",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jebediah.mobtech",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Precisamos da sua localização para mostrar sua posição no mapa."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyCu3VUou61FWaMXLwkJ4SFf7u6Sf8HqiUw"
+      }
     },
+
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -22,7 +31,7 @@
       "predictiveBackGestureEnabled": false,
       "config": {
         "googleMaps": {
-          "apiKey": ""
+          "apiKey": "AIzaSyCu3VUou61FWaMXLwkJ4SFf7u6Sf8HqiUw"
         }
       },
       "permissions": [
@@ -31,10 +40,12 @@
       ],
       "package": "com.jebediah.mobtech"
     },
+
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/appstore.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -43,31 +54,34 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#00A89D",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#00A89D"
           }
         }
       ],
       [
-      "expo-location",
+        "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
           "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "dade3a2e-4d2b-4d4d-858f-a1b74e5750a1"
       },
-      "googlePlacesApiKey": ""
+      "googlePlacesApiKey": "AIzaSyCu3VUou61FWaMXLwkJ4SFf7u6Sf8HqiUw"
     },
+
     "owner": "jebediah"
   }
 }
