@@ -33,6 +33,39 @@ async function obterLinhaPorId(req, res) {
     }
 }
 
+async function buscarPorNumero(req, res) {
+  try {
+    const { numero } = req.params;
+    
+    const linha = await Linha.findOne({
+      where: { numero }, // ← busca pelo CAMPO numero, não id
+      include: [
+        {
+          model: Parada,
+          through: { attributes: ['sequencia', 'sentido'] },
+          attributes: ['id', 'nome', 'localizacao']
+        }
+      ]
+    });
+
+    if (!linha) {
+      return res.status(404).json({ erro: 'Linha não encontrada' });
+    }
+
+    res.json({ 
+      linha: {
+        id: linha.id,
+        numero: linha.numero,
+        nome: linha.nome,
+        paradas: linha.Paradas || []
+      }
+    });
+  } catch (erro) {
+    console.error(erro);
+    res.status(500).json({ erro: 'Erro ao buscar linha' });
+  }
+}
+
 async function listarParadasDaLinha(req, res) {
     try {
         const { id } = req.params;
@@ -71,5 +104,6 @@ async function listarParadasDaLinha(req, res) {
 module.exports = {
     listarLinhas,
     obterLinhaPorId,
-    listarParadasDaLinha
+    listarParadasDaLinha,
+    buscarPorNumero
 };

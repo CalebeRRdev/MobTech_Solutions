@@ -10,6 +10,12 @@ Content-Type: application/json
 
 ###
 
+###
+GET http://localhost:3000/linhas/numero/11
+Content-Type: application/json
+
+###
+
 ### Buscar todas as paradas que uma linha de ônibus tem
 GET http://localhost:3000/linhas/2/paradas
 Content-Type: application/json
@@ -84,4 +90,18 @@ Content-Type: application/json
 // -16.353882447875694, -48.93957418890316
 // -16.29493815749534, -48.944616386506915
 // -16.33320967191722, -48.92046450470594
+###
+
+###
+POST http://localhost:3000/rotas/eta
+Content-Type: application/json
+
+{
+  "origemLat": -16.325,
+  "origemLon": -48.925,
+  "destinoLat": -16.353,
+  "destinoLon": -48.939
+}
+
+
 ###

@@ -1,9 +1,9 @@
 import { View, Text } from 'react-native';
 
-export default function ProfileScreen() {
+export default function TrackingScreen() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>perfil em breve...</Text>
+      <Text>Rastreamento da linha em breve...</Text>
     </View>
   );
 }

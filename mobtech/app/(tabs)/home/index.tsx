@@ -129,7 +129,7 @@ export default function HomeScreen() {
     if (search.origin && search.destination) {
       // Navega para a Tela 4 (Recommended Routes)
       router.push({
-        pathname: '/(tabs)/home/rotas',
+        pathname: '/(modal)/rotas',
         params: {
           originLat: search.origin.latitude.toString(),
           originLng: search.origin.longitude.toString(),
