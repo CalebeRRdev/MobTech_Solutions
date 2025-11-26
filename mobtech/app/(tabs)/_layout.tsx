@@ -8,18 +8,25 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false, // O Stack aninhado lidará com os headers
-        tabBarActiveTintColor: '#2d83ecff',
+        // 🔽 Esconde completamente a barra de abas embaixo
+        tabBarStyle: {
+          display: 'none',
+        },
       }}
     >
       {/* Ponto de Entrada: Redireciona a rota / para /home */} 
-      <Tabs.Screen name="index" options={{ href: null }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null, // não aparece na barra
+        }}
+      />
 
-      {/* A pasta 'home' contém o Stack Navigator da Home */}
+      {/* A pasta 'home' continua existindo, mas não aparece na barra inferior */}
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons name="home-outline" color={color} size={24} />,
+          href: null, // esconde o botão "Home" da tab bar
         }}
       />
 
@@ -28,7 +35,9 @@ export default function TabLayout() {
         name="records"
         options={{
           title: 'Registros',
-          tabBarIcon: ({ color }) => <Ionicons name="document-text-outline" color={color} size={24} />,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="document-text-outline" color={color} size={24} />
+          ),
         }}
       />
 
@@ -37,51 +46,11 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <Ionicons name="person-outline" color={color} size={24} />,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person-outline" color={color} size={24} />
+          ),
         }}
       />
     </Tabs>
   );
 }
-
-// import { Tabs } from 'expo-router';
-// import Ionicons from '@expo/vector-icons/Ionicons';
-
-// export default function TabLayout() {
-//     return (
-//         <Tabs
-//             screenOptions={{
-//                 tabBarActiveTintColor: '#2d83ecff',
-//                 headerStyle: {
-//                     backgroundColor: '#1e5ca7ff',
-//                 },
-//                 headerShadowVisible: false,
-//                 headerTintColor: '#fff',
-//                 tabBarStyle: {
-//                     backgroundColor: '#fff'
-//                 },
-//                 // headerShown: false
-//             }}
-//         >
-//             <Tabs.Screen 
-//                 name="index" 
-//                 options={{ 
-//                     title: 'Home', 
-//                     tabBarIcon: ({ color, focused}) => (
-//                         <Ionicons name={focused ? 'map' : 'map-outline'} color={color} size={24}/>
-//                     ),
-//                 }} 
-//             />
-            
-//             <Tabs.Screen
-//                 name="search" 
-//                 options={{ 
-//                     title: 'search',
-//                     tabBarIcon: ({color, focused}) => (
-//                         <Ionicons name={focused ? 'search' : 'search-outline'} color={color} size={24}/>
-//                     ),
-//                 }} 
-//             />
-//         </Tabs>
-//     );
-// }
