@@ -11,9 +11,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../../constants/colors';
-import api from '../../../service/api';
-import { ENDPOINTS } from '../../../service/endpoints';
+import { COLORS } from '../../constants/colors';
+import api from '../../service/api';
+import { ENDPOINTS } from '../../service/endpoints';
 
 interface RouteOption {
   tipo: 'direta' | 'baldeacao';
@@ -131,10 +131,18 @@ export default function RecommendedRoutes() {
   }, [originLat, originLng, destLat, destLng, linhaNomes]);
 
   const handleSelectRoute = (route: Route) => {
+    // Remove "Bus " de todas as linhas (direta ou com baldeação)
+    const numerosLimpos = route.lineNumber
+      .replace(/Bus /g, '')     // remove TODOS os "Bus "
+      .replace(/\s+/g, '')      // remove espaços extras
+      .split(',')               // separa por vírgula
+      .map(n => n.trim())
+      .filter(Boolean);         // remove vazio
+
     router.push({
-      pathname: '/(tabs)/home/routeDetails',
+      pathname: '/(modal)/routeDetails',
       params: {
-        lineNumber: route.lineNumber.replace('Bus ', ''),
+        lineNumber: numerosLimpos.join(','),  // "11" ou "11,2"
         lineName: route.lineName,
         originLat,
         originLng,
@@ -204,7 +212,7 @@ export default function RecommendedRoutes() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Recommended Routes</Text>
+        <Text style={styles.title}>Rotas recomendadas</Text>
       </View>
 
       {loading ? (
@@ -235,9 +243,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 80,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
+    padding: 20,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',

@@ -1,43 +1,25 @@
 // app/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false, // O Stack aninhado lidará com os headers
-        // 🔽 Esconde completamente a barra de abas embaixo
+        tabBarActiveTintColor: '#00A89D',
         tabBarStyle: {
           display: 'none',
-        },
+         }, 
       }}
     >
-      {/* Ponto de Entrada: Redireciona a rota / para /home */} 
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null, // não aparece na barra
-        }}
-      />
 
-      {/* A pasta 'home' continua existindo, mas não aparece na barra inferior */}
+      {/* A pasta 'home' contém o Stack Navigator da Home */}
       <Tabs.Screen
         name="home"
         options={{
-          href: null, // esconde o botão "Home" da tab bar
-        }}
-      />
-
-      {/* A pasta 'records' contém o Stack Navigator dos Registros */}
-      <Tabs.Screen
-        name="records"
-        options={{
-          title: 'Registros',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="document-text-outline" color={color} size={24} />
-          ),
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Ionicons name="home-outline" color={color} size={24} />,
         }}
       />
 
@@ -46,9 +28,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="person-outline" color={color} size={24} />
-          ),
+          tabBarIcon: ({ color }) => <Ionicons name="person-outline" color={color} size={24} />,
         }}
       />
     </Tabs>
