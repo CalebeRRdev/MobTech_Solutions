@@ -9,22 +9,27 @@ import {
   StyleSheet,
   ActivityIndicator,
   Keyboard,
-  // Adicionado Alert para feedback visual
   Alert,
 } from 'react-native';
-// Removido Marker, pois usaremos showsUserLocation
-import MapView, { Marker } from 'react-native-maps'; 
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+  Region,
+} from 'react-native-maps';
+import * as ExpoLocation from 'expo-location';
 import FloatingActionButton from '../../../components/map/FloatingActionButton';
 import { COLORS } from '../../../constants/colors';
 import { useSearch } from '../../../context/SearchContext';
-import { useGooglePlaces, PlaceSuggestion } from '../../../hooks/useGooglePlaces';
+import {
+  useGooglePlaces,
+  PlaceSuggestion,
+} from '../../../hooks/useGooglePlaces';
 import { useLocation } from '../../../hooks/useLocation';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 type Mode = 'idle' | 'searching' | 'confirmed';
 
-// Adicionada interface para o Marcador de Destino
 interface DestinationLocation {
   latitude: number;
   longitude: number;
@@ -33,36 +38,135 @@ interface DestinationLocation {
 
 export default function HomeScreen() {
   const [mode, setMode] = useState<Mode>('idle');
-  const { location: userLocation, loading: locationLoading } = useLocation();
+
+  const {
+    location: userLocation,
+    loading: locationLoading,
+    permissionStatus,
+    error: locationError,
+  } = useLocation();
+
   const { search, setSearch } = useSearch();
-  // Adicionado state para o marcador, pois useSearch é global e pode ser complexo
-  const [destinationMarker, setDestinationMarker] = useState<DestinationLocation | null>(null); 
+  const [destinationMarker, setDestinationMarker] =
+    useState<DestinationLocation | null>(null);
 
-  // useGooglePlaces agora usa um hook que retorna a função de busca e detalhes
-  const { suggestions, loading: placesLoading, search: searchPlaces, getDetails } = useGooglePlaces(userLocation);
+  const {
+    suggestions,
+    loading: placesLoading,
+    search: searchPlaces,
+    getDetails,
+  } = useGooglePlaces(userLocation || undefined);
+
   const router = useRouter();
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<MapView | null>(null);
 
-  // FUNÇÃO PARA CENTRALIZAR O MAPA NO USUÁRIO
-  const centerMapOnUser = () => {
-    if (userLocation && mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      });
-    } else {
-      Alert.alert("Localização", "Aguardando localização do usuário...");
-    }
+  // Fallback (enquanto não tem localização) – centro de Anápolis
+  const fallbackRegion: Region = {
+    latitude: -16.3286,
+    longitude: -48.9534,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
   };
 
-  // Centraliza no usuário apenas na primeira vez que a localização é obtida
   useEffect(() => {
-    if (userLocation && mapRef.current && !search.destination) {
-      centerMapOnUser();
+    console.log('userLocation =>', JSON.stringify(userLocation));
+    console.log('permissionStatus =>', permissionStatus);
+    if (locationError) {
+      console.log('locationError =>', locationError);
     }
-  }, [userLocation]);
+  }, [userLocation, permissionStatus, locationError]);
+
+  /**
+   * Centraliza o mapa na localização atual do usuário.
+   *
+   * Prioridade:
+   * 1) location do hook (rápido, em memória)
+   * 2) lastKnownPosition (rápido, cache do SO)
+   * 3) getCurrentPositionAsync (mais lento, só usado se não houver nada)
+   */
+  const centerMapOnUser = async () => {
+    try {
+      if (!mapRef.current) return;
+
+      // 1. Garante permissão
+      let status = permissionStatus;
+
+      if (!status) {
+        const perm = await ExpoLocation.getForegroundPermissionsAsync();
+        status = perm.status;
+      }
+
+      if (status !== ExpoLocation.PermissionStatus.GRANTED) {
+        Alert.alert(
+          'Localização desativada',
+          'Ative a permissão de localização do aplicativo para usar o mapa em tempo real.'
+        );
+        return;
+      }
+
+      // 2. Tenta usar primeiro a localização do hook (já em memória)
+      if (userLocation) {
+        const { latitude, longitude } = userLocation;
+        console.log('[centerMapOnUser] usando location do hook:', {
+          latitude,
+          longitude,
+        });
+
+        mapRef.current.animateCamera(
+          {
+            center: { latitude, longitude },
+            zoom: 17,
+          },
+          { duration: 800 }
+        );
+        return;
+      }
+
+      // 3. Se não tiver no hook, tenta a última posição conhecida
+      const last = await ExpoLocation.getLastKnownPositionAsync();
+      if (last) {
+        const { latitude, longitude } = last.coords;
+        console.log('[centerMapOnUser] usando lastKnownPosition:', {
+          latitude,
+          longitude,
+        });
+
+        mapRef.current.animateCamera(
+          {
+            center: { latitude, longitude },
+            zoom: 17,
+          },
+          { duration: 800 }
+        );
+        return;
+      }
+
+      // 4. Como último recurso, pede um fix novo (pode demorar)
+      const pos = await ExpoLocation.getCurrentPositionAsync({
+        accuracy: ExpoLocation.Accuracy.Balanced,
+      });
+
+      const { latitude, longitude } = pos.coords;
+      console.log('[centerMapOnUser] usando getCurrentPositionAsync:', {
+        latitude,
+        longitude,
+      });
+
+      mapRef.current.animateCamera(
+        {
+          center: { latitude, longitude },
+          zoom: 17,
+        },
+        { duration: 800 }
+      );
+    } catch (err) {
+      console.log('[centerMapOnUser] erro ao obter localização:', err);
+      Alert.alert(
+        'Localização',
+        'Não foi possível obter sua localização agora.'
+      );
+    }
+  };
 
   // Busca em tempo real
   useEffect(() => {
@@ -71,53 +175,78 @@ export default function HomeScreen() {
     }
   }, [search.query, mode]);
 
-  // Ação ao pressionar Enter (Submeter ou Confirmar)
   const handleConfirm = async () => {
-    // Ação principal é selecionar a primeira sugestão, garantindo a regionalidade
     if (suggestions.length > 0) {
       await handleSelectPlace(suggestions[0]);
     } else if (search.query.trim().length > 0) {
-      // Fallback: Tentar geocodificar o texto puro. 
-      // Esta lógica é complexa e exige a Geocoding API com *location bias* (melhor no hook).
-      // Por enquanto, faremos a confirmação com o texto, mas é crucial usar a sugestão.
-      Alert.alert("Atenção", "Selecione um endereço da lista para garantir a precisão regional!");
-      return; 
+      Alert.alert(
+        'Atenção',
+        'Selecione um endereço da lista para garantir a precisão regional!'
+      );
+      return;
     }
     Keyboard.dismiss();
   };
 
-  // Ação ao selecionar um local da lista (fluxo principal)
   const handleSelectPlace = async (place: PlaceSuggestion) => {
-    const details = await getDetails(place.place_id);
-    if (details && userLocation) {
+    try {
+      console.log('[handleSelectPlace] place selecionado:', place.description);
+
+      const details = await getDetails(place.place_id);
+
+      if (!details) {
+        console.log('[handleSelectPlace] details veio vazio/null');
+        Alert.alert(
+          'Erro',
+          'Não foi possível obter os detalhes desse destino. Tente novamente.'
+        );
+        return;
+      }
+
       const destinationData: DestinationLocation = {
         latitude: details.latitude,
         longitude: details.longitude,
-        // Usamos a descrição da sugestão (que é mais completa)
-        address: place.description || details.address, 
+        address: place.description || details.address,
       };
 
-      // 1. Atualiza o Contexto de Busca
+      // Usa a origem atual se existir, senão usa a location do hook, senão undefined
+      const newOrigin = search.origin ?? userLocation ?? undefined;
+
       setSearch({
+        ...search,
         query: place.description,
-        origin: userLocation,
+        origin: newOrigin,
         destination: destinationData,
       });
-      // 2. Atualiza o Marcador
+
       setDestinationMarker(destinationData);
-      // 3. Muda o Modo e Centraliza
       setMode('confirmed');
-      mapRef.current?.animateToRegion({
-        latitude: destinationData.latitude,
-        longitude: destinationData.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      });
+
+      console.log('[handleSelectPlace] indo para destino:', destinationData);
+
+      if (mapRef.current) {
+        mapRef.current.animateCamera(
+          {
+            center: {
+              latitude: destinationData.latitude,
+              longitude: destinationData.longitude,
+            },
+            zoom: 17,
+          },
+          { duration: 800 }
+        );
+      }
+    } catch (err) {
+      console.log('[handleSelectPlace] erro ao selecionar destino:', err);
+      Alert.alert(
+        'Erro',
+        'Não foi possível selecionar esse destino agora. Tente novamente.'
+      );
+    } finally {
+      Keyboard.dismiss();
     }
-    Keyboard.dismiss();
   };
-  
-  // Limpa a busca e volta para o modo inicial
+
   const handleBack = () => {
     setMode('idle');
     setSearch({ query: '' });
@@ -126,34 +255,57 @@ export default function HomeScreen() {
   };
 
   const handleFindBus = () => {
-    if (search.origin && search.destination) {
-      // Navega para a Tela 4 (Recommended Routes)
-      router.push({
-        pathname: '/(tabs)/home/rotas',
-        params: {
-          originLat: search.origin.latitude.toString(),
-          originLng: search.origin.longitude.toString(),
-          destLat: search.destination.latitude.toString(),
-          destLng: search.destination.longitude.toString(),
-          destAddress: search.destination.address,
-        },
-      });
+    const dest = search.destination;
+  
+    if (!dest) {
+      Alert.alert(
+        'Destino obrigatório',
+        'Escolha um destino na barra de busca antes de procurar ônibus.'
+      );
+      return;
     }
+  
+    // Se não tiver origin no contexto, tenta usar userLocation;
+    // se mesmo assim não tiver, cai num fallback fixo (centro de Anápolis).
+    const origin =
+      search.origin ??
+      userLocation ?? {
+        latitude: -16.3286,
+        longitude: -48.9534,
+      };
+  
+    router.push({
+      pathname: '/(tabs)/home/rotas',
+      params: {
+        originLat: origin.latitude.toString(),
+        originLng: origin.longitude.toString(),
+        destLat: dest.latitude.toString(),
+        destLng: dest.longitude.toString(),
+        destAddress: dest.address,
+      },
+    });
   };
 
-  const currentDestination = search.destination as DestinationLocation | undefined;
-  
+  const currentDestination = search.destination as
+    | DestinationLocation
+    | undefined;
+
   return (
     <View style={styles.container}>
       {/* MAPA */}
       <MapView
         ref={mapRef}
         style={StyleSheet.absoluteFillObject}
-        showsUserLocation={true} // Habilita o marcador azul nativo do Google
-        followsUserLocation={false} // Desabilitado o Marker customizado do usuário que estava deslizando
+        provider={PROVIDER_GOOGLE}
+        showsUserLocation={true}
+        followsUserLocation={false}
         showsMyLocationButton={false}
+        initialRegion={fallbackRegion}
+        onMapReady={() => {
+          console.log('[onMapReady] mapa pronto, centralizando no usuário');
+          centerMapOnUser();
+        }}
       >
-        {/* MARCADOR DO DESTINO (vermelho) */}
         {destinationMarker && (
           <Marker
             coordinate={destinationMarker}
@@ -168,14 +320,17 @@ export default function HomeScreen() {
         {mode === 'idle' ? (
           <>
             <Text style={styles.title}>Para onde você gostaria de ir?</Text>
-            <TouchableOpacity style={styles.searchBar} onPress={() => setMode('searching')}>
+            <TouchableOpacity
+              style={styles.searchBar}
+              onPress={() => setMode('searching')}
+            >
               <Ionicons name="search" size={20} color={COLORS.textLight} />
               <Text style={styles.placeholder}>Para onde...</Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
-            <View style={styles.searchInputRow}>
+            <View className="searchInputRow" style={styles.searchInputRow}>
               <TouchableOpacity onPress={handleBack}>
                 <Ionicons name="arrow-back" size={24} color={COLORS.text} />
               </TouchableOpacity>
@@ -183,31 +338,44 @@ export default function HomeScreen() {
                 style={styles.textInput}
                 placeholder="Ex: Av. Mato Grosso"
                 value={search.query}
-                onChangeText={text => setSearch({ query: text })}
+                onChangeText={(text) => setSearch({ query: text })}
                 onSubmitEditing={handleConfirm}
                 returnKeyType="search"
                 autoFocus={mode === 'searching'}
               />
-              {placesLoading && <ActivityIndicator size="small" color={COLORS.primary} />}
+              {placesLoading && (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              )}
             </View>
 
-            {/* SUGESTÕES NA ABA SUPERIOR */}
             {mode === 'searching' && search.query.length >= 3 && (
               <View style={styles.suggestionsBox}>
-                {placesLoading && <ActivityIndicator style={{ padding: 12 }} />}
+                {placesLoading && (
+                  <ActivityIndicator style={{ padding: 12 }} />
+                )}
+
                 {!placesLoading && suggestions.length > 0 && (
                   <FlatList
                     data={suggestions}
-                    keyExtractor={item => item.place_id}
+                    keyExtractor={(item) => item.place_id}
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         style={styles.suggestionItem}
                         onPress={() => handleSelectPlace(item)}
                       >
-                        <Ionicons name="location-outline" size={16} color={COLORS.primary} />
+                        <Ionicons
+                          name="location-outline"
+                          size={16}
+                          color={COLORS.primary}
+                        />
                         <View style={{ flex: 1, marginLeft: 8 }}>
-                          <Text style={styles.suggestionMain}>{item.structured_formatting.main_text}</Text>
-                          <Text style={styles.suggestionSecondary} numberOfLines={1}>
+                          <Text style={styles.suggestionMain}>
+                            {item.structured_formatting.main_text}
+                          </Text>
+                          <Text
+                            style={styles.suggestionSecondary}
+                            numberOfLines={1}
+                          >
                             {item.structured_formatting.secondary_text}
                           </Text>
                         </View>
@@ -216,19 +384,32 @@ export default function HomeScreen() {
                     keyboardShouldPersistTaps="handled"
                   />
                 )}
-                {!placesLoading && search.query.length >= 3 && suggestions.length === 0 && (
-                  <Text style={styles.noResults}>Nenhum resultado</Text>
-                )}
+
+                {!placesLoading &&
+                  search.query.length >= 3 &&
+                  suggestions.length === 0 && (
+                    <Text style={styles.noResults}>Nenhum resultado</Text>
+                  )}
               </View>
             )}
-            
-            {/* BOTÃO CONFIRMAR: Só aparece se houver texto, mas deve ser usado após selecionar uma sugestão */}
-            {mode === 'searching' && search.query.length > 0 && suggestions.length === 0 && (
-              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-                 <Ionicons name="alert-circle-outline" size={20} color="#fff" />
-                 <Text style={styles.confirmText}>Confirme pela lista de sugestões!</Text>
-              </TouchableOpacity>
-            )}
+
+            {mode === 'searching' &&
+              search.query.length > 0 &&
+              suggestions.length === 0 && (
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={handleConfirm}
+                >
+                  <Ionicons
+                    name="alert-circle-outline"
+                    size={20}
+                    color="#fff"
+                  />
+                  <Text style={styles.confirmText}>
+                    Confirme pela lista de sugestões!
+                  </Text>
+                </TouchableOpacity>
+              )}
           </>
         )}
       </View>
@@ -237,6 +418,7 @@ export default function HomeScreen() {
       {mode === 'confirmed' && currentDestination && (
         <View style={styles.bottomCard}>
           <Text style={styles.title}>Para onde você gostaria de ir?</Text>
+
           <View style={styles.locationRow}>
             <Ionicons name="pin" size={20} color={COLORS.primary} />
             <Text style={styles.locationLabel}>Sua localização</Text>
@@ -249,25 +431,28 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.findBusButton} onPress={handleFindBus}>
+          <TouchableOpacity
+            style={styles.findBusButton}
+            onPress={handleFindBus}
+          >
             <Text style={styles.findBusText}>Encontrar ônibus</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {/* BOTÃO FLUTUANTE (Centralizar Usuário) */}
-      <FloatingActionButton 
-        onPress={centerMapOnUser} 
-        iconName="locate" // Mudado para um ícone de localização
-        style={{ bottom: mode === 'confirmed' ? 250 : 30 }} // Posiciona acima da aba inferior
+      <FloatingActionButton
+        onPress={centerMapOnUser}
+        iconName="locate"
+        style={{ bottom: mode === 'confirmed' ? 250 : 30 }}
       />
     </View>
   );
 }
 
-// Removido styles userMarkerContainer, userMarkerDot, userMarkerPulse pois usaremos o nativo
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
+
   topCard: {
     position: 'absolute',
     top: 60,
@@ -282,12 +467,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
   },
+
   title: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1a1a1a',
     marginBottom: 12,
   },
+
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -295,22 +482,26 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
   },
+
   placeholder: {
     marginLeft: 8,
     color: '#666',
     fontSize: 16,
   },
+
   searchInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
   },
+
   textInput: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
     color: '#1a1a1a',
   },
+
   suggestionsBox: {
     maxHeight: 200,
     backgroundColor: '#fff',
@@ -320,6 +511,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
   },
+
   suggestionItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -327,9 +519,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  suggestionMain: { fontSize: 16, fontWeight: '600', color: '#1a1a1a' },
-  suggestionSecondary: { fontSize: 14, color: '#666', marginTop: 2 },
-  noResults: { padding: 12, color: '#666', fontStyle: 'italic' },
+
+  suggestionMain: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+
+  suggestionSecondary: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+
+  noResults: {
+    padding: 12,
+    color: '#666',
+    fontStyle: 'italic',
+  },
+
   confirmButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -339,31 +547,39 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 12,
   },
-  confirmText: { color: '#fff', fontWeight: '600', marginLeft: 8 },
+
+  confirmText: {
+    color: '#fff',
+    fontWeight: '600',
+    marginLeft: 8,
+  },
 
   bottomCard: {
     position: 'absolute',
-    bottom: 0, 
-    left: 0, // Mudei para 0 para esticar por toda a largura
-    right: 0, // Mudei para 0 para esticar por toda a largura
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#fff',
-    borderRadius: 0, // Removi o arredondamento inferior
-    borderTopLeftRadius: 16, // Mantive o arredondamento superior
-    borderTopRightRadius: 16, // Mantive o arredondamento superior
+    borderRadius: 0,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     padding: 16,
-    paddingBottom: 40, // Adicionei padding inferior para dar espaço (pode ser ajustado)
+    paddingBottom: 40,
     elevation: 8,
   },
+
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
   },
+
   locationLabel: {
     marginLeft: 12,
     fontSize: 16,
     color: '#1a1a1a',
   },
+
   findBusButton: {
     backgroundColor: COLORS.primary,
     padding: 16,
@@ -371,6 +587,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 12,
   },
+
   findBusText: {
     color: '#fff',
     fontWeight: '600',

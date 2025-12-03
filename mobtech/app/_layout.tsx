@@ -2,12 +2,17 @@
 import { Stack } from 'expo-router';
 import { SearchProvider } from '../context/SearchContext';
 
-import * as SplashScreen from "expo-splash-screen";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 
 // Mantém a splash nativa visível até a gente mandar esconder
-SplashScreen.preventAutoHideAsync();
+// (try/catch para evitar erros em recarregamentos)
+try {
+  SplashScreen.preventAutoHideAsync();
+} catch (e) {
+  console.log('preventAutoHideAsync já foi chamado ou falhou:', e);
+}
 
 export default function RootLayout() {
   const [appReady, setAppReady] = useState(false);
@@ -23,8 +28,9 @@ export default function RootLayout() {
   const SPLASH_FADE_MS = 1700;
 
   // Curva bem "Apple-like" (ease-out suave)
-  const IOS_EASE_OUT = Easing.bezier(0.22, 1, 0.36, 1);
+  const EASING_OUT = Easing.bezier(0.22, 1, 0.36, 1);
 
+  // 1) Simula carregamento de assets / inicialização do app
   useEffect(() => {
     async function prepare() {
       try {
@@ -37,33 +43,44 @@ export default function RootLayout() {
     prepare();
   }, []);
 
+  // 2) Esconde a splash nativa do Expo assim que a root view tiver layout
   const onLayoutRootView = useCallback(async () => {
-    if (appReady) {
-      // Esconde a splash nativa do Expo (a nossa overlay já está por cima)
+    if (!appReady) return;
+    try {
       await SplashScreen.hideAsync();
-
-      // Segura a splash um pouco e depois faz a transição suave
-      Animated.parallel([
-        Animated.sequence([
-          Animated.delay(SPLASH_HOLD_MS),
-          Animated.timing(scale, {
-            toValue: 1.06, // leve zoom a mais, bem sutil
-            duration: SPLASH_FADE_MS,
-            easing: IOS_EASE_OUT,
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.sequence([
-          Animated.delay(SPLASH_HOLD_MS),
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: SPLASH_FADE_MS,
-            easing: IOS_EASE_OUT,
-            useNativeDriver: true,
-          }),
-        ]),
-      ]).start(() => setShowSplash(false));
+    } catch (e) {
+      console.log('Erro ao esconder splash nativa:', e);
     }
+  }, [appReady]);
+
+  // 3) Roda a ANIMAÇÃO da splash em cima do app (iOS + Android)
+  useEffect(() => {
+    if (!appReady) return;
+
+    const animation = Animated.parallel([
+      Animated.sequence([
+        Animated.delay(SPLASH_HOLD_MS),
+        Animated.timing(scale, {
+          toValue: 1.06, // leve zoom a mais, bem sutil
+          duration: SPLASH_FADE_MS,
+          easing: EASING_OUT,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.sequence([
+        Animated.delay(SPLASH_HOLD_MS),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: SPLASH_FADE_MS,
+          easing: EASING_OUT,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
+
+    animation.start(() => {
+      setShowSplash(false);
+    });
   }, [appReady, opacity, scale]);
 
   return (
@@ -71,22 +88,19 @@ export default function RootLayout() {
       <SearchProvider>
         <Stack>
           {/* A rota "(tabs)" é o seu navegador de abas. 
-            O headerShown: false garante que as abas não tenham um header duplicado. 
-          */}
+              O headerShown: false garante que as abas não tenham um header duplicado. */}
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
           {/* Exemplo de uma tela fora das abas (Login) 
-            - Precisa ser adicionada ao Stack principal.
-          */}
+              - Precisa ser adicionada ao Stack principal. */}
           <Stack.Screen name="login" options={{ headerShown: false }} />
 
           {/* Configuração de um Modal global (opcional)
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          */}
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> */}
         </Stack>
       </SearchProvider>
 
-      {/* Splash overlay animada */}
+      {/* Splash overlay animada em cima de TUDO */}
       {showSplash && (
         <Animated.View
           pointerEvents="none"
@@ -99,28 +113,25 @@ export default function RootLayout() {
           <Text style={styles.title}>MobTech</Text>
         </Animated.View>
       )}
-
-      {/* O Stack principal permite que telas como Login ou Modals sejam empilhadas acima das abas. */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   splash: {
-    backgroundColor: "#00A89D",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#00A89D',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 48,
-    fontWeight: "700",
+    fontWeight: '700',
     letterSpacing: 0.6,
-
     // SF Pro no iOS, fallback no Android
     fontFamily: Platform.select({
-      ios: "System",       // San Francisco (SF Pro)
-      android: "Roboto",   // fallback padrão
+      ios: 'System', // San Francisco (SF Pro)
+      android: 'Roboto',
     }),
   },
 });

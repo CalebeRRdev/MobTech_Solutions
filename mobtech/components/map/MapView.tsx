@@ -1,80 +1,57 @@
 // components/map/MapView.tsx
 import React, { forwardRef } from 'react';
-import { StyleSheet, View } from 'react-native';
-import RNMapView, { Region } from 'react-native-maps';
+import { StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
+import RNMapView, { Region, PROVIDER_GOOGLE } from 'react-native-maps';
 
-interface MapViewProps {
+interface MapViewProps extends React.ComponentProps<typeof RNMapView> {
+  /** Região controlada (quando o mapa é "controlado") */
   region?: Region;
-  children?: React.ReactNode;
+  /** Estilo opcional pro container externo */
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
-const MapView = forwardRef<RNMapView, MapViewProps>(({ region, children }, ref) => {
-  const defaultRegion: Region = {
-    latitude: -23.5505,
-    longitude: -46.6333,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  };
+/**
+ * Wrapper de RNMapView para padronizar:
+ * - provider Google em iOS e Android
+ * - região inicial default (Anápolis) quando nada é passado
+ * - uso de forwardRef pra permitir animateToRegion etc.
+ */
+const MapView = forwardRef<RNMapView, MapViewProps>(
+  ({ children, region, initialRegion, style, containerStyle, ...rest }, ref) => {
+    const defaultRegion: Region = {
+      // Centro de Anápolis como fallback
+      latitude: -16.3286,
+      longitude: -48.9534,
+      latitudeDelta: 0.08,
+      longitudeDelta: 0.08,
+    };
 
-  return (
-    <View style={styles.container}>
-      <RNMapView
-        ref={ref}
-        style={StyleSheet.absoluteFillObject}
-        region={region || defaultRegion}
-        showsUserLocation={false} // ← DESATIVA O ÍCONE PADRÃO
-        followsUserLocation={false} // ← DESATIVA SEGUIR AUTOMÁTICO
-      >
-        {children}
-      </RNMapView>
-    </View>
-  );
-});
+    // Se a tela não passar nada, usamos defaultRegion como initialRegion.
+    // Se "region" for usado (mapa controlado), não forçamos initialRegion.
+    const resolvedInitialRegion =
+      initialRegion ?? (region ? undefined : defaultRegion);
+
+    return (
+      <View style={[styles.container, containerStyle]}>
+        <RNMapView
+          ref={ref}
+          style={StyleSheet.absoluteFillObject}
+          provider={PROVIDER_GOOGLE}
+          region={region}
+          initialRegion={resolvedInitialRegion}
+          {...rest}
+        >
+          {children}
+        </RNMapView>
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+  },
 });
 
 export default MapView;
-
-
-
-
-// // components/map/MapView.tsx
-// import React from 'react';
-// import { StyleSheet, View } from 'react-native';
-// import { Region } from 'react-native-maps';
-// import RNMapView from 'react-native-maps';
-
-// interface MapViewProps {
-//   region?: Region;
-//   children?: React.ReactNode;
-// }
-
-// export default function MapView({ region, children }: MapViewProps) {
-//   const defaultRegion: Region = {
-//     latitude: -23.5505,
-//     longitude: -46.6333,
-//     latitudeDelta: 0.0922,
-//     longitudeDelta: 0.0421,
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <RNMapView
-//         style={StyleSheet.absoluteFillObject}
-//         region={region || defaultRegion}
-//         showsUserLocation
-//         followsUserLocation
-//       >
-//         {children}
-//       </RNMapView>
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-// });

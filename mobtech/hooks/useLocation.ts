@@ -1,27 +1,67 @@
 // hooks/useLocation.ts
 import * as Location from 'expo-location';
 import { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
+
+type SimpleLocation = {
+  latitude: number;
+  longitude: number;
+};
 
 export function useLocation() {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [location, setLocation] = useState<SimpleLocation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [permissionStatus, setPermissionStatus] =
+    useState<Location.PermissionStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setLoading(false);
-        return;
-      }
+    let isMounted = true;
 
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-      setLocation({
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
-      });
-      setLoading(false);
-    })();
+    const loadLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (!isMounted) return;
+
+        setPermissionStatus(status);
+
+        if (status !== Location.PermissionStatus.GRANTED) {
+          setError('Permissão de localização negada.');
+          setLoading(false);
+          return;
+        }
+
+        const current = await Location.getCurrentPositionAsync({
+          accuracy:
+            Platform.OS === 'android'
+              ? Location.Accuracy.Balanced
+              : Location.Accuracy.High,
+        });
+
+        if (!isMounted) return;
+
+        setLocation({
+          latitude: current.coords.latitude,
+          longitude: current.coords.longitude,
+        });
+        setError(null);
+      } catch (err: any) {
+        if (!isMounted) return;
+        console.log('Erro ao obter localização:', err);
+        setError('Não foi possível obter a localização do dispositivo.');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadLocation();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  return { location, loading };
+  return { location, loading, permissionStatus, error };
 }
