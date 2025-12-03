@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
@@ -40,13 +41,7 @@ export default function RecommendedRoutes() {
   const [loading, setLoading] = useState(true);
   const [linhaNomes, setLinhaNomes] = useState<Record<string, string>>({});
 
-  const {
-    originLat,
-    originLng,
-    destLat,
-    destLng,
-    destAddress,
-  } = params as {
+  const { originLat, originLng, destLat, destLng, destAddress } = params as {
     originLat: string;
     originLng: string;
     destLat: string;
@@ -79,15 +74,14 @@ export default function RecommendedRoutes() {
       try {
         setLoading(true);
 
-        // CORREÇÃO AQUI
         const origem = {
           latitude: Number(originLat),
-          longitude: Number(originLng)
+          longitude: Number(originLng),
         };
 
         const destino = {
           latitude: Number(destLat),
-          longitude: Number(destLng)
+          longitude: Number(destLng),
         };
 
         const res = await api.post(ENDPOINTS.ROTAS, { origem, destino });
@@ -100,12 +94,13 @@ export default function RecommendedRoutes() {
           const nomeLinha = linhaNomes[linhaPrincipal] || 'Linha Desconhecida';
 
           // Formata: "Bus 11, 2"
-          const lineNumberText = todasLinhas.map(num => `Bus ${num}`).join(', ');
+          const lineNumberText = todasLinhas
+            .map((num) => `Bus ${num}`)
+            .join(', ');
 
           // Se for baldeação, mostra "Várias linhas"
-          const displayName = opcao.tipo === 'baldeacao' 
-            ? '(baldeação)' 
-            : nomeLinha;
+          const displayName =
+            opcao.tipo === 'baldeacao' ? '(baldeação)' : nomeLinha;
 
           return {
             id: `${index}-${todasLinhas.join('-')}`,
@@ -113,15 +108,24 @@ export default function RecommendedRoutes() {
             lineName: displayName,
             distanceKm: Number((opcao.distancia_ate_parada / 1000).toFixed(1)),
             estimatedMinutes: opcao.embarque_eta_minutos,
-            signalStrength: Math.max(20, 100 - opcao.embarque_eta_minutos * 2),
-            tipo: opcao.tipo, // para usar no ícone
+            signalStrength: Math.max(
+              20,
+              100 - opcao.embarque_eta_minutos * 2
+            ),
+            tipo: opcao.tipo,
           };
         });
 
         setRoutes(rotasFormatadas);
       } catch (error: any) {
-        console.error('Erro ao buscar rotas:', error.response?.data || error.message);
-        Alert.alert('Erro', error.response?.data?.erro || 'Não foi possível carregar as rotas.');
+        console.error(
+          'Erro ao buscar rotas:',
+          error.response?.data || error.message
+        );
+        Alert.alert(
+          'Erro',
+          error.response?.data?.erro || 'Não foi possível carregar as rotas.'
+        );
       } finally {
         setLoading(false);
       }
@@ -196,7 +200,11 @@ export default function RecommendedRoutes() {
 
       <View style={styles.cardFooter}>
         <View style={styles.distanceContainer}>
-          <Ionicons name="location-outline" size={16} color={COLORS.textLight} />
+          <Ionicons
+            name="location-outline"
+            size={16}
+            color={COLORS.textLight}
+          />
           <Text style={styles.distanceText}>
             {item.distanceKm} Km away from you
           </Text>
@@ -207,7 +215,7 @@ export default function RecommendedRoutes() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
@@ -234,12 +242,13 @@ export default function RecommendedRoutes() {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -248,8 +257,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginLeft: 16 },
+
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginLeft: 16,
+  },
+
   listContent: { padding: 16 },
+
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -261,7 +278,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+
   busIconContainer: {
     width: 40,
     height: 40,
@@ -271,22 +290,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
+
   lineInfo: { flex: 1 },
+
   lineNumber: { fontSize: 16, fontWeight: '700', color: COLORS.primary },
+
   lineName: { fontSize: 14, color: '#666', marginTop: 2 },
+
   signalContainer: { flexDirection: 'row', alignItems: 'flex-end', gap: 2 },
-  signalBar: { width: 3, backgroundColor: '#ddd', borderRadius: 1 },
+
+  signalBar: { width: 3, borderRadius: 1 },
+
   signalActive: { backgroundColor: COLORS.primary },
+
   signalInactive: { backgroundColor: '#ddd' },
+
   divider: { height: 1, backgroundColor: '#eee', marginVertical: 8 },
-  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
   distanceContainer: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+
   distanceText: { marginLeft: 6, fontSize: 14, color: '#666' },
+
   estimatedTime: { fontSize: 24, fontWeight: '600', color: '#1a1a1a' },
+
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
   loadingText: { marginTop: 12, color: '#666' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+
   emptyText: { marginTop: 16, fontSize: 16, color: '#999' },
+
   transferBadge: {
     position: 'absolute',
     top: -6,

@@ -4,14 +4,23 @@
     "slug": "mobtech",
     "version": "1.0.0",
     "orientation": "portrait",
+
     "icon": "./assets/images/appstore.png",
+
     "scheme": "mobtech",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
 
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "backgroundColor": "#00A89D",
+      "resizeMode": "cover"
+    },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.jebediah.mobtech",
+      "icon": "./assets/images/appstore.png",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Precisamos da sua localização para mostrar sua posição no mapa."
       },
@@ -21,23 +30,27 @@
     },
 
     "android": {
+      "icon": "./assets/images/playstore.png",
+
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/playstore.png",
+        "backgroundColor": "#00A89D"
       },
+
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyCu3VUou61FWaMXLwkJ4SFf7u6Sf8HqiUw"
         }
       },
+
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
+
       "package": "com.jebediah.mobtech"
     },
 
@@ -51,6 +64,7 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/images/splash.png",
           "backgroundColor": "#00A89D",
           "resizeMode": "cover",
           "dark": {

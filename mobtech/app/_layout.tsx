@@ -10,13 +10,11 @@ export default function RootLayout() {
       <SearchProvider>
         <Stack>
           {/* A rota "(tabs)" é o seu navegador de abas. 
-            O headerShown: false garante que as abas não tenham um header duplicado. 
-          */}
+              O headerShown: false garante que as abas não tenham um header duplicado. */}
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
   
           {/* Exemplo de uma tela fora das abas (Login) 
-            - Precisa ser adicionada ao Stack principal.
-          */}
+              - Precisa ser adicionada ao Stack principal. */}
           <Stack.Screen name="login" options={{ headerShown: false }} />
   
           {/* Configuração de um Modal global (opcional)
