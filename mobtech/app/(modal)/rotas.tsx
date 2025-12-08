@@ -203,18 +203,24 @@ export default function RecommendedRoutes() {
       <View style={styles.divider} />
 
       <View style={styles.cardFooter}>
-        <View style={styles.distanceContainer}>
-          <Ionicons
-            name="location-outline"
-            size={16}
-            color={COLORS.textLight}
-          />
-          <Text style={styles.distanceText}>
-            {item.distanceKm} Km away from you
-          </Text>
-        </View>
-        <Text style={styles.estimatedTime}>{item.estimatedMinutes}</Text>
-      </View>
+  <View style={styles.distanceContainer}>
+    <Ionicons
+      name="location-outline"
+      size={16}
+      color={COLORS.textLight}
+    />
+    <Text style={styles.distanceText}>
+      {item.distanceKm} km de você
+    </Text>
+  </View>
+
+  {/* minutos no formato 2', 3' ou <1' */}
+  <Text style={styles.estimatedTime}>
+    {item.estimatedMinutes <= 0
+      ? "<1'"
+      : `${Math.round(item.estimatedMinutes)}'`}
+  </Text>
+</View>
     </TouchableOpacity>
   );
 

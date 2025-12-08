@@ -254,7 +254,7 @@ export default function HomeScreen() {
     centerMapOnUser();
   };
 
-  const handleFindBus = () => {
+  const handleFindBus = async () => {
     const dest = search.destination;
   
     if (!dest) {
@@ -265,15 +265,58 @@ export default function HomeScreen() {
       return;
     }
   
-    // Se não tiver origin no contexto, tenta usar userLocation;
-    // se mesmo assim não tiver, cai num fallback fixo (centro de Anápolis).
-    const origin =
+    // 1. Tenta usar origem já conhecida (contexto ou hook)
+    let origin =
       search.origin ??
-      userLocation ?? {
-        latitude: -16.3286,
-        longitude: -48.9534,
-      };
+      userLocation ??
+      null;
   
+    // 2. Se ainda não tiver origem, tenta pegar agora via Expo Location
+    if (!origin) {
+      try {
+        // tenta última posição conhecida
+        const last = await ExpoLocation.getLastKnownPositionAsync();
+        if (last) {
+          origin = {
+            latitude: last.coords.latitude,
+            longitude: last.coords.longitude,
+          };
+          console.log('[handleFindBus] usando lastKnownPosition como origem:', origin);
+        } else {
+          // se não tiver lastKnown, pede uma nova posição
+          const pos = await ExpoLocation.getCurrentPositionAsync({
+            accuracy: ExpoLocation.Accuracy.Balanced,
+          });
+          origin = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          };
+          console.log('[handleFindBus] usando getCurrentPositionAsync como origem:', origin);
+        }
+      } catch (err) {
+        console.log('[handleFindBus] erro ao obter origem em fallback:', err);
+      }
+    }
+  
+    // 3. Se MESMO ASSIM não tiver origem, aí sim mostra o alerta
+    if (!origin) {
+      Alert.alert(
+        'Localização indisponível',
+        'Não foi possível obter sua localização. Verifique as permissões de localização e tente novamente.'
+      );
+      return;
+    }
+  
+    // 4. Guarda essa origem no contexto para as próximas telas/vezes
+    setSearch({
+      ...search,
+      origin,
+    });
+  
+    console.log('[handleFindBus] origin usada:', origin);
+    console.log('[handleFindBus] dest usada:', dest);
+  
+    // 5. Vai pra tela de rotas com a origem REAL do usuário
     router.push({
       pathname: '/(modal)/rotas',
       params: {

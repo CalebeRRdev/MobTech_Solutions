@@ -6,7 +6,6 @@
     "orientation": "portrait",
 
     "icon": "./assets/images/appstore.png",
-
     "scheme": "mobtech",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -91,6 +90,9 @@
       "eas": {
         "projectId": "dade3a2e-4d2b-4d4d-858f-a1b74e5750a1"
       },
+
+      "googleMapsApiKey": "AIzaSyCu3VUou61FWaMXLwkJ4SFf7u6Sf8HqiUw",
+
       "googlePlacesApiKey": "AIzaSyCu3VUou61FWaMXLwkJ4SFf7u6Sf8HqiUw"
     },
 
