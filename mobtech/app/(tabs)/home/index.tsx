@@ -275,7 +275,7 @@ export default function HomeScreen() {
       };
   
     router.push({
-      pathname: '/(tabs)/home/rotas',
+      pathname: '/(modal)/rotas',
       params: {
         originLat: origin.latitude.toString(),
         originLng: origin.longitude.toString(),

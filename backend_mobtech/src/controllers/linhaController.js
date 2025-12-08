@@ -1,3 +1,4 @@
+// src/controllers/linhaController.js
 const { Linha, Trajeto, Parada } = require('../models');
 const { Sequelize } = require('sequelize');
 

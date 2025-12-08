@@ -14,30 +14,12 @@ export default function TabLayout() {
         },
       }}
     >
-      {/* Ponto de Entrada: Redireciona a rota / para /home */} 
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null, // não aparece na barra
-        }}
-      />
 
       {/* A pasta 'home' continua existindo, mas não aparece na barra inferior */}
       <Tabs.Screen
         name="home"
         options={{
           href: null, // esconde o botão "Home" da tab bar
-        }}
-      />
-
-      {/* A pasta 'records' contém o Stack Navigator dos Registros */}
-      <Tabs.Screen
-        name="records"
-        options={{
-          title: 'Registros',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="document-text-outline" color={color} size={24} />
-          ),
         }}
       />
 

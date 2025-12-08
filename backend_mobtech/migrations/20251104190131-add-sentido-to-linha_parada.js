@@ -3,14 +3,12 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('linha_parada', 'sentido', {
-      type: Sequelize.ENUM('ida', 'volta'),
-      allowNull: true,
-      after: 'sequencia' // opcional, apenas organiza a posição no schema
-    });
+    // Intencionalmente vazio.
+    // A coluna "sentido" já é definida no model LinhaParada
+    // e será criada via sequelize.sync().
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('linha_parada', 'sentido');
+    // Intencionalmente vazio.
   }
 };

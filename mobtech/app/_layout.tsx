@@ -1,15 +1,18 @@
 // app/_layout.tsx
 import { Stack } from 'expo-router';
 import { SearchProvider } from '../context/SearchContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 
 // Mantém a splash nativa visível até a gente mandar esconder
-// (try/catch para evitar erros em recarregamentos)
+// MAS agora só em produção, para não travar o dev
 try {
-  SplashScreen.preventAutoHideAsync();
+  if (process.env.NODE_ENV === 'production') {
+    SplashScreen.preventAutoHideAsync();
+  }
 } catch (e) {
   console.log('preventAutoHideAsync já foi chamado ou falhou:', e);
 }
@@ -46,7 +49,10 @@ export default function RootLayout() {
   // 2) Esconde a splash nativa do Expo assim que a root view tiver layout
   const onLayoutRootView = useCallback(async () => {
     if (!appReady) return;
+
     try {
+      // Em dev isso é basicamente no-op,
+      // em produção é quem libera a splash nativa.
       await SplashScreen.hideAsync();
     } catch (e) {
       console.log('Erro ao esconder splash nativa:', e);
@@ -84,36 +90,40 @@ export default function RootLayout() {
   }, [appReady, opacity, scale]);
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <SearchProvider>
-        <Stack>
-          {/* A rota "(tabs)" é o seu navegador de abas. 
-              O headerShown: false garante que as abas não tenham um header duplicado. */}
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <SearchProvider>
+          <Stack>
+            {/* A rota "(tabs)" é o seu navegador de abas. 
+                O headerShown: false garante que as abas não tenham um header duplicado. */}
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-          {/* Exemplo de uma tela fora das abas (Login) 
-              - Precisa ser adicionada ao Stack principal. */}
-          <Stack.Screen name="login" options={{ headerShown: false }} />
+            {/* Tela fora das abas (Login) */}
+            <Stack.Screen name="login" options={{ headerShown: false }} />
 
-          {/* Configuração de um Modal global (opcional)
-              <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> */}
-        </Stack>
-      </SearchProvider>
+            {/* Novo grupo de modais usando a pasta (modal) */}
+            <Stack.Screen name="(modal)" options={{ headerShown: false }} />
+            {/* Se um dia quiser um modal "solto":
+                <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> 
+            */}
+          </Stack>
+        </SearchProvider>
 
-      {/* Splash overlay animada em cima de TUDO */}
-      {showSplash && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            styles.splash,
-            { opacity, transform: [{ scale }] },
-          ]}
-        >
-          <Text style={styles.title}>MobTech</Text>
-        </Animated.View>
-      )}
-    </View>
+        {/* Splash overlay animada em cima de TUDO */}
+        {showSplash && (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              styles.splash,
+              { opacity, transform: [{ scale }] },
+            ]}
+          >
+            <Text style={styles.title}>MobTech</Text>
+          </Animated.View>
+        )}
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
