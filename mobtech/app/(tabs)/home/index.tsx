@@ -76,6 +76,13 @@ export default function HomeScreen() {
     }
   }, [userLocation, permissionStatus, locationError]);
 
+  // Se já houver destino salvo no contexto, garante que o pino vermelho apareça
+  useEffect(() => {
+    if (search.destination && !destinationMarker) {
+      setDestinationMarker(search.destination as DestinationLocation);
+    }
+  }, [search.destination, destinationMarker]);
+
   /**
    * Centraliza o mapa na localização atual do usuário.
    *
@@ -256,7 +263,7 @@ export default function HomeScreen() {
 
   const handleFindBus = async () => {
     const dest = search.destination;
-  
+
     if (!dest) {
       Alert.alert(
         'Destino obrigatório',
@@ -264,13 +271,13 @@ export default function HomeScreen() {
       );
       return;
     }
-  
+
     // 1. Tenta usar origem já conhecida (contexto ou hook)
     let origin =
       search.origin ??
       userLocation ??
       null;
-  
+
     // 2. Se ainda não tiver origem, tenta pegar agora via Expo Location
     if (!origin) {
       try {
@@ -297,7 +304,7 @@ export default function HomeScreen() {
         console.log('[handleFindBus] erro ao obter origem em fallback:', err);
       }
     }
-  
+
     // 3. Se MESMO ASSIM não tiver origem, aí sim mostra o alerta
     if (!origin) {
       Alert.alert(
@@ -306,16 +313,16 @@ export default function HomeScreen() {
       );
       return;
     }
-  
+
     // 4. Guarda essa origem no contexto para as próximas telas/vezes
     setSearch({
       ...search,
       origin,
     });
-  
+
     console.log('[handleFindBus] origin usada:', origin);
     console.log('[handleFindBus] dest usada:', dest);
-  
+
     // 5. Vai pra tela de rotas com a origem REAL do usuário
     router.push({
       pathname: '/(modal)/rotas',
@@ -332,6 +339,28 @@ export default function HomeScreen() {
   const currentDestination = search.destination as
     | DestinationLocation
     | undefined;
+
+  const centerMapOnDestination = () => {
+    if (!mapRef.current || !currentDestination) {
+      Alert.alert(
+        'Destino',
+        'Nenhum destino selecionado no momento. Escolha um destino na barra de busca.'
+      );
+      return;
+    }
+
+    const { latitude, longitude } = currentDestination;
+
+    mapRef.current.animateCamera(
+      {
+        center: { latitude, longitude },
+        zoom: 17,
+      },
+      { duration: 800 }
+    );
+  };
+
+  const baseFabBottom = mode === 'confirmed' ? 250 : 30;
 
   return (
     <View style={styles.container}>
@@ -468,7 +497,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={[styles.locationRow, { marginTop: 8 }]}>
-            <Ionicons name="flag" size={20} color={COLORS.red} />
+            <Ionicons name="pin" size={20} color={COLORS.red} />
             <Text style={styles.locationLabel} numberOfLines={1}>
               {currentDestination.address}
             </Text>
@@ -487,8 +516,17 @@ export default function HomeScreen() {
       <FloatingActionButton
         onPress={centerMapOnUser}
         iconName="locate"
-        style={{ bottom: mode === 'confirmed' ? 250 : 30 }}
+        style={{ bottom: baseFabBottom }}
       />
+
+      {/* BOTÃO FLUTUANTE (Centralizar Destino) */}
+      {currentDestination && (
+        <FloatingActionButton
+          onPress={centerMapOnDestination}
+          iconName="flag"
+          style={{ bottom: baseFabBottom + 70 }}
+        />
+      )}
     </View>
   );
 }
@@ -498,7 +536,7 @@ const styles = StyleSheet.create({
 
   topCard: {
     position: 'absolute',
-    top: 60,
+    top: 68,
     left: 20,
     right: 20,
     backgroundColor: '#fff',

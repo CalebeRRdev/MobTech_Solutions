@@ -1,0 +1,61 @@
+.
+├── docs
+│   └── tests
+│       ├── backend-tests.md
+│       ├── desempenho-polling.md
+│       ├── e2e-scenarios.md
+│       └── usabilidade-script.md
+├── estrutura-backend.txt
+├── index.js
+├── jest.config.cjs
+├── jestconfig.cjs
+├── migrations
+│   ├── 20251023173703-drop-trajetos-table.js
+│   └── 20251104190131-add-sentido-to-linha_parada.js
+├── package-lock.json
+├── package.json
+├── request.http
+├── scripts
+│   └── preencherSentidoLinhaParada.js
+├── seeders
+│   ├── 20251020170629-populate-paradas.js
+│   ├── 20251020183506-populate-linhas.js
+│   └── 20251020193636-populate-linhaParada.js
+├── src
+│   ├── app.js
+│   ├── config
+│   │   ├── database.js
+│   │   └── sequelize.js
+│   ├── controllers
+│   │   ├── linhaController.js
+│   │   ├── localizacaoOnibusController.js
+│   │   ├── onibusController.js
+│   │   ├── paradaController.js
+│   │   ├── rotaController.js
+│   │   └── trajetoController.js
+│   ├── models
+│   │   ├── index.js
+│   │   ├── linha.js
+│   │   ├── linhaParada.js
+│   │   ├── localizacaoOnibus.js
+│   │   ├── onibus.js
+│   │   └── parada.js
+│   ├── routes
+│   │   ├── index.js
+│   │   ├── linhaRoutes.js
+│   │   ├── localizacaoOnibusRoutes.js
+│   │   ├── paradaRoutes.js
+│   │   ├── rotaRoutes.js
+│   │   └── trajetoRoutes.js
+│   ├── simulador
+│   │   └── onibusSimulator.js
+│   └── utils
+│       └── geoUtils.js
+└── tests
+    ├── performance
+    │   └── rotas.performance.test.js
+    ├── sanity.test.js
+    └── unit
+        └── geoUtils.js
+
+16 directories, 43 files
